@@ -1,0 +1,424 @@
+@font-face {
+		font-family: 'GoodDogRegular';
+		src: url('/fonts/GoodDog-webfont.eot') format('eot'),
+			url('/fonts/GoodDog-webfont.woff') format('woff'),
+			url('/fonts/GoodDog-webfont.ttf') format('truetype'),
+			url('/fonts/GoodDog-webfont.svg') format('svg');
+		font-weight: normal;
+		font-style: normal;
+	}
+
+	body
+	{
+		/*font-family: 'GoodDogRegular';*/
+		font-family:Arial, sans-serif;
+		background-color: #414042;
+	}
+	#board
+	{
+		position:relative;
+		top:18px;
+		border-radius: 10px 10px 10px 10px;
+-moz-border-radius: 10px 10px 10px 10px;
+-webkit-border-radius: 10px 10px 10px 10px;
+border: 11px ridge #d6d6d6;
+/*background-image: url('/images/whiteboard_shadow.png');
+/*background-size: cover;*/
+/*background-position-x: 30px;
+    /*background-position-y: 30px; */
+    /*background-repeat: no-repeat;*/
+
+background-image: url('/images/whiteboard_shadow.png');
+/*background-size: cover;*/
+background-position-x: 30px;
+    /*background-position-y: 30px; */
+    background-repeat: round;
+}
+
+		
+	/*	overflow: hidden;*/
+	.title
+	{
+		position:absolute;
+		text-align:center;
+		color:black;
+		font-size:21px;
+		padding: 2px 0px;
+		height: 26px;
+		background-image: linear-gradient(to right, #FAA634 33%, rgba(255,255,255,0) 0%);
+		background-position: bottom;
+		background-size: 85px 4px;
+		background-repeat: repeat-x;
+
+	}
+
+	.currentViewTitle {
+		color: #E6E7E8;
+	}
+	
+
+	.todayInWeek {
+		height:initial;
+		/*background-color: white;*/
+		position:absolute;
+		background-image: linear-gradient(#FAA634 33%, rgba(255,255,255,0) 0%);
+		background-position: left;
+		background-size: 4px 80px;
+		background-repeat: repeat-y;
+		top:30px;
+		-webkit-box-shadow: inset 0px 0px 203px -74px rgba(20,110,180,1);
+-moz-box-shadow: inset 0px 0px 203px -74px rgba(20,110,180,1);
+box-shadow: inset 0px 0px 203px -74px rgba(20,110,180,1);
+	}
+	.scrollTo {
+		position:absolute;
+		background-color:#414042;
+		z-index:1;
+        width: 30px;
+	}
+	#rightWeekArrow {
+		position:absolute;
+		background:rgba(0,0,0,.6);
+		
+        width: 30px;
+		right:0px;
+	}
+	#leftWeekArrow {
+		position:absolute;
+		background:rgba(0,0,0,.6);
+		
+        width: 30px;
+		left:0px;
+	}
+
+	.todaysection
+	{
+		overflow-y:auto;
+		position:absolute;
+		overflow-x:hidden;
+		/*background-color: white; */
+		padding-right: 15px;
+	}
+
+	.lastsection
+	{
+		background-image: linear-gradient(#FAA634 33%, rgba(255,255,255,0) 0%);
+		background-position: left;
+		background-size: 4px 80px;
+		background-repeat: repeat-y;
+		top:30px;
+		
+		position:absolute;
+	}
+
+	.section
+	{
+		/*background-color: white; */
+		position:absolute;
+		background-image: linear-gradient(#FAA634 33%, rgba(255,255,255,0) 0%);
+		background-position: left;
+		background-size: 4px 80px;
+		background-repeat: repeat-y;
+		top:30px;
+		height:96%;
+	}
+
+	.weeklySections {
+		height:initial;
+	}
+	.scheduledCard {
+		width:92%;
+		float:none;
+		/*max-height: 63px;*/
+		overflow: none;
+		position:absolute;
+	}
+
+	.normalCard	{
+		float:left;
+		width: 140px;
+		margin: 10px;
+		-webkit-box-shadow: 0px 0px 13px 4px rgba(0,0,0,0.23);
+		-moz-box-shadow: 0px 0px 13px 4px rgba(0,0,0,0.23);
+		box-shadow: 0px 0px 13px 4px rgba(0,0,0,0.23);
+	}
+
+	.cardTitle
+	{
+		background-color: transparent;
+		padding: 2px;
+		text-align: center;
+		font-family: 'GoodDogRegular';
+		font-size: 16px;
+	}
+
+	.cardTitleHidden
+	{
+		display:none;
+	}
+
+	.panel-card
+	{
+		background-color: transparent;
+		overflow:hidden;
+	}
+
+	.cardContents
+	{
+		padding: 3px;
+		background-color: transparent;
+		overflow-wrap:break-word;
+		font-family: 'GoodDogRegular';
+		font-size:16px;
+		text-align: center;
+		text-decoration: none;
+		color:#414042;
+	}
+
+	textarea[class*='thVal']
+	{
+		width:97%;
+		color:#414042;
+		resize:none;
+		overflow:hidden;
+		background-color: transparent;
+		font-family: 'GoodDogRegular';
+		font-size:16px;
+		text-align: center;
+	}
+
+	input[class*='easyui-textbox']
+	{
+		resize:none;
+		overflow:hidden;
+		background-color: transparent;
+		font-size:12px;
+		text-align: center;
+		border:0px;
+	}
+	
+	textarea[class*='timer']
+	{
+		resize:none;
+        overflow:hidden;
+        width:40%;
+        height:11px;
+        background-color: transparent;
+        font-family: 'GoodDogRegular';
+        font-size:13px;
+		border: none;
+		color:#414042;
+	}
+
+	tr[class*='inprogress-dropable'] {
+		font-weight:normal;
+		text-align:center;
+		margin-left:20px
+	}
+	a{
+		color: #fff;
+		text-decoration: none;
+	}
+
+	.sectionThumb {
+		float: left;
+		margin: 3px;
+		background-image: linear-gradient(#FAA634 33%, rgba(255,255,255,0) 0%);
+		background-position: left;
+		background-size: 2px 8px;
+		background-repeat: repeat-y;
+		height:40px;
+		padding-left:7px;
+		color:#414042;
+
+	}
+	.settingsSectionFooter {
+		height:40px;
+		background-image: linear-gradient(to right, #FAA634 33%, rgba(255,255,255,0) 0%);
+		background-position: top;
+		background-size: 8px 2px;
+		background-repeat: repeat-x;
+		white-space: pre;
+	}
+
+	.settingsSectionHeader {
+		border:0px;
+	}
+	input:focus{
+		outline:1px;
+	}
+
+	table
+	{
+		border-collapse:collapse;
+		border-spacing:0;
+		margin-left: 15px;
+		text-align: left;
+	}
+	td
+	{
+		font-family:Arial, sans-serif;
+		/*padding:6px 1px;*/
+		border-style:solid;
+		border-width:0px;
+		overflow:hidden;
+		word-break:normal;
+		border-top-width:1px;
+		border-bottom-width:1px;
+		border-color:#FAA634;
+	}
+	.scheduleTableRow	
+	{
+		font-family:Arial, sans-serif;
+		/*padding:6px 1px;*/
+		border-style:solid;
+		border-width:0px;
+		overflow:hidden;
+		word-break:normal;
+		/*border-top-width:1px; */
+		border-bottom-width:1px;
+		border-color:#FAA634;
+	}
+
+	.full-spectrum .sp-palette {
+		max-width: 100px;
+	}
+	.plus-sign {
+		top:2px;
+		left:2px;
+		width:5px;
+		height:16px;
+		position:relative;
+		margin-left:5px;
+		border-radius:5px;
+	}
+	.plus-sign:before{
+		background:inherit;
+		content:"";
+		width:16px;
+		height:5px;
+		position:absolute;
+		top:5px;
+		left:-5px;
+		border-radius:5px;
+	} 
+	.addCardContainer {
+		position:relative;
+		left:3px;
+		height:20px;
+		width:20px;
+		border-radius:20px;
+		background-color: rgba(0,0,0,0.30);
+		-webkit-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.23);
+		-moz-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.23);
+		box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.23);
+	}
+	.dayViewContainerTable {
+		width:93%;
+		margin-left:38px;
+	}
+	.weekViewContainerTable {
+		width:93%;
+	}
+	.rightArrow {
+	float:right;
+    border-right:4px solid;
+    border-bottom:4px solid;
+    border-color: #A4D7F4;
+    width:13px;
+    height:13px;
+    transform: rotate(-45deg);
+    margin-top:5px;
+    margin-right:15px;
+}
+.leftArrow {
+	float:left;
+    border-left:4px solid;
+    border-bottom:4px solid;
+    border-color: #A4D7F4;
+    width:13px;
+    height:13px;
+    transform: rotate(45deg);
+        margin-top:5px;
+    margin-left:15px;
+    
+}
+#viewTitle{
+	top:0;
+	left:0;
+	position:absolute;
+text-align:center;
+width:100%;
+		color:black;
+		font-size:21px;
+}
+.hidden {
+	display: none;
+}
+.liveContactDetails {
+	background-color: transparent;
+	padding: 2px;
+	text-align: center;
+	font-family: 'GoodDogRegular';
+	font-size: 20px;
+	margin-top: -19px;
+    margin-bottom: -10px;
+    margin-left: 10px;
+	/*float: left;*/
+}
+
+.actionableCaseDetails {
+background-color: transparent;
+		padding: 2px;
+		text-align: center;
+		font-family: 'GoodDogRegular';
+		font-size: 20px;
+		margin-top: -19px;
+    margin-bottom: -10px;
+    margin-left: 10px;
+		/*float: left;*/
+}
+
+.engineerDetails {
+	background-color: transparent;
+		padding: 2px;
+		text-align: center;
+		font-family: 'GoodDogRegular';
+		font-size: 20px;
+		margin-top: -19px;
+    margin-bottom: -9px;
+    margin-left: 10px;
+		/*float: left;*/
+}
+.unclaimedInterviews {
+	background-color: transparent;
+		padding: 2px;
+		text-align: center;
+		font-family: 'GoodDogRegular';
+		font-size: 20px;
+		margin-top: -19px;
+    margin-bottom: -9px;
+    border-left: 2px solid black; 
+    border-right: 2px solid black;
+    margin-left: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top-left-radius: 19px;
+    border-top-right-radius: 19px;
+		/*float: left;*/
+	}
+.usernameHolder {
+	font-family: 'GoodDogRegular';
+	font-size:20px;
+	text-align: center;
+    padding-right: 160px;
+    padding-left: 211px;
+    padding-top: 36px;
+    padding-bottom: 30px;
+}
+/*
+	.panel-footer
+	{
+		margin-top: -20px;
+	}
+	*/

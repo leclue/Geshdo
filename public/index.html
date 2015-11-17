@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Geshdo</title>
+	<link rel="stylesheet" type="text/css" href="/css/easyui.css">
+	<link rel="stylesheet" type="text/css" href="/css/icon.css">
+	<link rel="stylesheet" type="text/css" href="/css/demo.css">
+	<link rel="stylesheet" type="text/css" href="/css/geshdo.css">
+	<link rel="stylesheet" type="text/css" href="/css/spectrum.css" />
+	
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="/js/spectrum.js"></script>
+	<script type="text/javascript" src="/js/loadpage.js"></script>
+	<script type="text/javascript" src="/js/date.format.js"></script>
+	<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
+	<link rel="shortcut icon" href="/images/favicon.ico" />
+</head>
+<!--Geshdo is a JS based web tool employing scrum and kanban methodologies in combination with scheduling components to structure and manage a to-do list.-->
+<body>
+	<div id="viewTitle"></div>
+	<div id="board" class="board">
+	
+	</div>
+
+	<div id="dlg" class="easyui-dialog" title="Customize your Geshdo board" data-options="iconCls:'icon-save',closed:true" style="width:555px;height:450px;padding:10px">
+        <form id="userSettings" method="post">
+            <table style="max-width:555px">
+            <tbody>
+            	<tr>
+                	<td>Name:</td>
+                	<td><input class="easyui-textbox" type="text" name="name" data-options="required:true,editable:false" style="border:1px"></input></td>
+                </tr>
+                <tr>
+                	<td>Team Name:</td>
+                	<td><input class="easyui-textbox" type="text" name="teamname" data-options="required:false,editable:true" style="border:1px"></input></td>
+                </tr>
+                <tr>
+                	<td style="border-bottom-width:1px;float: left;width: 100%;border-top-width: 0px;">Board Sections:</td>
+                	<td id="addSectionTD" style="border-bottom-width:1px;">
+                		<a href="#" id="addSection"><img src="/images/edit_add.png" style="width:16px;float:right;padding-right:5px"/></a>
+                		<a href="#" id="removeSection"><img src="/images/edit_remove.png" style="width:16px;float:right;padding-right:5px"/></a>
+                		<div id="sectionLimitWarnUpper" style="display: none;color:red;padding-right:5px;float:right;">7 Sections Max</div>
+                		<div id="sectionLimitWarnLower" style="display: none;color:red;padding-right:5px;float:right;">2 Sections Min</div>
+                	</td>
+                </tr>
+                <tr>
+                <td colspan="2" id="sectionThumbsContainer" style="border-style:hidden">
+
+                  </td>
+                </tr>
+                <tr>
+                	<td style="border-bottom-width:1px;float: left;width: 100%;border-top-width: 0px;">Card Types:</td>
+                	<td style="border-bottom-width:1px;">
+                		<a href="#" id="addCardType"><img src="/images/edit_add.png" style="width:16px;float:right;padding-right:5px"></a>
+                		<a href="#" id="removeCardType"><img src="/images/edit_remove.png" style="width:16px;float:right;padding-right:5px"/></a>
+                		<div id="cardTypeLimitWarnLower" style="display: none;color:red;padding-right:5px;float:right;">2 Card Types Min</div>
+                	</td>
+                </tr>
+                <tr style="border-style:hidden">
+                	<td colspan="2" id="cardTypesContainer">
+                		
+                    </td>
+                </tr>
+                <tr>
+                	<td>Default View:</td>
+                	<td>
+	                	<select id="defaultViewCombobox" class="easyui-combobox" name="defaultView" data-options="multiple:false,editable:false,panelHeight:'80'" style="width:148px;float:right">
+						    <option value="day">Day</option>
+						    <option>Week</option>
+						    <option>Month</option>
+						    <option>Team Week</option>
+						    <option>Team Overview</option>
+						</select>
+					</td>
+                </tr>
+             </tbody>
+            </table>
+        </form>
+        <div style="text-align:center;padding:5px">
+            <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">Save & Close</a>
+        </div>
+    </div>
+
+    <div id="metadatadlg" class="easyui-dialog" title="Set Card Metadata" data-options="iconCls:'icon-save',closed:true" style="width:360px;height:350px;padding:10px">
+        <form id="cardSettings" method="post">
+            <table style="max-width:300px; margin:auto;" cellpadding="3">
+            <tbody>
+            	<tr>
+                	<td>Schedule:</td>
+                	<td>
+                		<input id="cardScheduledTime" name="cardScheduledTime" style="width:80px;">
+                		<input class="easyui-datebox" id="cardScheduledDate" name="cardScheduledDate"  style="width:93px">
+                	</td>
+                </tr>
+                <tr>
+                	<td>Duration (minutes):</td>
+                	<td>
+                		<input id="cardDuration" name="cardDuration" class="easyui-numberspinner" style="width:80px;" data-options="min:15,max:1440,increment:15,editable:false" value="60">
+                	</td>
+                </tr>
+                <tr>
+                	<td>Repeat:</td>
+                	<td>
+                		<select id="recurringCombobox" class="easyui-combobox" name="recurringCombobox" value="None" style="width:179px;float:right">
+						    <option value="None">None</option>
+						    <option value="Daily">Daily</option>
+						    <option value="Weekly">Weekly</option>
+						    <option value="Fortnightly">Fortnightly</option>
+						    <option value="Monthly">Monthly</option>
+						</select>
+                	</td>
+                </tr>
+                <tr>
+                	<td>Additional Data:</td>
+                	<td>
+                		<input class="easyui-textbox" type="text" name="morecarddata" id="morecarddata" data-options="multiline:true,height:150,editable:true" style="border:1px;width:180px;text-align:left;"></input>
+                	</td>
+                </tr>
+             </tbody>
+            </table>
+        </form>
+        <div id="timeDateWarn" style="display: none;color:red;padding-right:5px;">Both Date and Time is required, not either</div>
+        <div id="minuteWarn" style="display: none;color:red;padding-right:5px;">Minutes should be in increments of 15</div>
+        <div id="cardRepeatWarn" style="display: none;color:red;padding-right:5px;">Repeat should be None if card is not scheduled</div>
+        <div style="text-align:center;padding:5px">
+            <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitCardMetadata()">Save & Close</a>
+        </div>
+        <!-- <div id="timeDateWarn" style="display: none;color:red;padding-right:5px;width:100%">Both Date and Time is required, not either</div> -->
+    </div>
+
+<script type="text/javascript">
+
+	$('document').ready(init);
+	//When the page is loaded
+	function init(){
+		//Check if this is a new user
+		if (localStorage.getItem('username') === null ){
+       		$.messager.prompt('Have we met?', 'You are new, or something changed about your browser. Either way, enter your username to Geshdo:', function(r){
+           		if (r){
+           			localStorage.setItem('username',r)
+           			settingsUserName = r;
+           			getUserSettings(r);
+           		}
+       		});
+		}
+		else {
+			settingsUserName = localStorage.getItem('username');
+			getUserSettings(settingsUserName);
+		}
+
+		$('#cardScheduledTime').timespinner({
+    		increment:0,
+    		showSeconds: false,
+    		onSpinUp: function (){
+        		customIncDec("up", $(this))
+    		},
+    		onSpinDown: function (){
+        		customIncDec("down", $(this))
+    		}
+		});
+		$('#recurringCombobox').combo({
+			required:true,
+			multiple:false,
+			editable:false,
+			panelHeight:'80',
+			value:'Daily'
+		});	
+	}
+</script>
+
+<script>
+	//time to D some V's
+	var sqlQuery = "";
+	var newCardTitle = "";
+	var newCardHtml = "";
+	var newCardIdNum = 0;
+	var newCardColor = "";
+	var newCardContents = "";
+	var newCardSection = "";
+	var newCardTimespent = 0;
+	var newContents = "";
+	var prevTimeSpent = "";
+	var startTimeValue = 0;
+	var sessionTimeSpent = 0;
+	var CurrentCardTimer = "";
+	var settingsUserName = "";
+	var settingsSections = [];
+	var settingsCardTypes = [];
+	var settingsCardColors = [];
+	var settingsDefaultView = "";
+	var sectionTitleHTML = "";
+	var sectionHTML = "";
+	var addCardButtonsHTML = "";
+	var cardColorIDs = "";
+	var sectionIDs = "";
+	var addNewCardSection = "";
+	var cardColors = [];
+	var cardTypes = [];
+	var currentSections = [];
+	var currentCardTdIndex = 999;
+	var newCardRepeat = "";
+	var settingsTeamName = "";
+	var cardColourPallette = ['#FFFFCC', '#FFFF99', '#FFCCFF', '#FFCCCC', '#FFCC99', '#CCFFFF', '#CCFFCC', '#CCFF99', '#CCCCFF', '#CCCCCC', '#CCCC99', '#99FFCC', '#FCE89A', '#96BCB6', '#AECDA5']
+
+	//Save Card Metadata
+	function submitCardMetadata() {
+		var currentCardId = $("#metadatadlg").attr("cardid");
+		var cardMetadata = $('#cardSettings').serializeArray();
+		var cardScheduledTime = "";
+		var cardScheduledDate = "";
+		var cardDuration = "";
+		var cardRepeat = "";
+		var morecarddata = "";
+		var proceed = false;
+
+		$.each(cardMetadata, function( i, field ) {
+			if (field.name === "cardScheduledTime"){
+		    	cardScheduledTime = field.value;
+			}
+			else if (field.name === "cardScheduledDate"){
+				cardScheduledDate = field.value;
+			}
+			else if (field.name === "cardDuration"){
+				cardDuration = field.value;
+			}
+			else if (field.name === "recurringCombobox"){
+				cardRepeat = field.value;
+			}
+			else if (field.name === "morecarddata"){
+				morecarddata = field.value;
+			}
+		});
+		if (cardScheduledTime === "" || cardScheduledDate === "") {
+			//Either a date or time was specified, but not both
+			if (cardScheduledTime === "" && cardScheduledDate === "") {
+				if (cardRepeat != "None"){
+					$('#cardRepeatWarn').show(300).delay(5000).hide(300);
+				}
+				else {
+					proceed = true;
+				}
+			}
+			else {
+				$('#timeDateWarn').show(300).delay(5000).hide(300);
+			}
+		}
+		else {
+			if (cardScheduledTime.substring(parseInt(cardScheduledTime.indexOf(":") + 1)) %15 != 0){
+				$('#minuteWarn').show(300).delay(5000).hide(300);
+			}
+			else {
+				proceed = true;
+			}
+		}
+
+
+		if (proceed) {
+			//Convert selected time and date into a matching section name, eg: Mon-Oct2615Hour1330
+			var scheduledSectionID = ""
+			if (cardScheduledTime) {
+				var month = cardScheduledDate.substring(0, 2)
+				var day = cardScheduledDate.substring(3, 5)
+				var year = cardScheduledDate.substring(6, 10)
+				var hour = cardScheduledTime.substring(0, cardScheduledTime.indexOf(":"))
+				var min = cardScheduledTime.substring(parseInt(cardScheduledTime.indexOf(":") + 1))
+				var calcDate = new Date();
+				calcDate.setMonth(parseInt(month - 1))
+				calcDate.setDate(day)
+				calcDate.setFullYear(year)
+				calcDate.setHours(hour)
+				calcDate.setMinutes(min)
+				scheduledSectionID = calcDate.format('D-Mjy\\H\\o\\u\\rHi')
+			}
+
+			$.ajax({
+				type: "GET",
+				data: "time=" + cardScheduledTime + "&date=" + cardScheduledDate + "&repeat=" + cardRepeat + "&moredata=" + morecarddata + "&duration=" + cardDuration,
+		        url: "/setcardmetadata/" + currentCardId,
+		        success: function(msg){
+		        	//Submit settings to DB 
+		        	if (cardScheduledTime) {
+						updatecardsection (currentCardId, scheduledSectionID);
+					}
+		        	//close window
+		    		$('#metadatadlg').window('close');
+		    		//Refresh card
+		    		location.reload();
+		    		//$('#' + currentCardId).remove();
+		    		//spawnCard (currentCardId.substring(4), newCardColor, newCardId, newCardSection, newCardTimespent, newCardContents, newCardTitle, newCardDuration)
+		        },
+				cache: false
+		    });
+		}
+	}
+
+	//Custom incrementer for scheduling card
+	function customIncDec(decOrInc, spinnerId) {
+        var curval = spinnerId.timespinner('getValue')
+    	var opts = spinnerId.timespinner('options');
+		var tt = curval.split(opts.separator);
+        var myTime = new Date();
+        myTime.setHours(tt[0])
+        myTime.setMinutes(parseInt(tt[1]))
+        if (decOrInc === "down"){
+        	myTime.setTime(parseInt(myTime.getTime() - 900000))
+        }
+        else {
+            myTime.setTime(parseInt(myTime.getTime() + 900000))
+        }
+        spinnerId.timespinner('setValue', myTime.getHours() + ':' + myTime.getMinutes())
+	}
+
+	//Save settings
+	function submitForm() {
+		var newUserSettings = $('#userSettings').serializeArray();
+		
+		jQuery.each( newUserSettings, function( i, field ) {
+			if (field.name === "name"){
+		    	settingsUserName = field.value;
+			}
+			else if (field.name === "teamname"){
+		    	settingsTeamName = field.value;
+			}
+			else if (field.name === "defaultView"){
+				settingsDefaultView = field.value;
+			}
+			else if (field.name.match("section.")){
+				settingsSections.push(field.value);
+			}
+			else if (field.name.match("cardType.")){
+				settingsCardTypes.push(field.value);
+			}
+			else if (field.name.match("colorPickerCardType.")){
+				settingsCardColors.push(field.value.substring(1));
+			}
+		});
+
+		//Submit settings to DB
+		$.ajax({
+			type: "GET",
+			data: "&teamname=" + settingsTeamName + "&sections=" + JSON.stringify(settingsSections) + "&cardtitles=" + JSON.stringify(settingsCardTypes) + "&cardcolors=" + JSON.stringify(settingsCardColors) + "&defaultview=" + settingsDefaultView,
+            url: "/updatetusersettings/" + settingsUserName,
+            success: function(msg){
+            	console.log(msg);
+            },
+			cache: false,
+			async: false
+        });
+
+        //Set the title for current stickies if different
+        for (var i = 0, len = settingsCardTypes.length; i < len; i++){
+	        if (settingsCardTypes[i] !== cardTypes[i]){
+	        	$.ajax({
+					type: "GET",
+					async: false,
+					data: "newtitle=" + settingsCardTypes[i]  + "&oldtitle=" + cardTypes[i] + "&username=" + settingsUserName,
+		            url: "/updatetitlecards",
+		            success: function(msg){
+		            	console.log(msg);
+		            },
+					cache: false,
+					async: false
+		        });
+	        }
+	    }
+
+	    //Set the section ID for current stickies if different
+	    for (var i = 0, len = settingsSections.length; i < len; i++){
+	        if (settingsSections[i] !== currentSections[i]){
+	        	$.ajax({
+					type: "GET",
+					async: false,
+					data: "newsection=" + settingsSections[i]  + "&oldsection=" + currentSections[i] + "&username=" + settingsUserName,
+		            url: "/updatesectioncards",
+		            success: function(msg){
+		            	console.log(msg);
+		            },
+					cache: false,
+					async: false
+		        });
+	        }
+	    }
+
+        //close window
+        $('#dlg').window('close');
+
+        //refresh page
+        location.reload();
+	}
+
+	//Add Card Type
+	$('#addCardType').click(function (event) {
+		//Get next available card type
+		var newCardTypeId = parseInt($("#cardTypesContainer").children().length)+1;
+
+		var newCardTypeHTML = '<div style="width:224px;float:left;margin-right: 20px;">' +
+								'<input class="easyui-textbox" id="cardType' + newCardTypeId + '" name="cardType' + newCardTypeId + '" type="text" value="' + newCardTitle + '" style="float:left;width:97px;"></input>' +
+								'<input id="colorPickerCardType' + newCardTypeId + '" type="text" name="colorPickerCardType' + newCardTypeId + '" value="#' + newCardColor + '" style="float:right;"></input>' +
+							  '</div>'
+
+		$(newCardTypeHTML).appendTo($('#cardTypesContainer'));
+
+		$('#cardType' + newCardTypeId).textbox({disabled:false});
+
+        //color picker
+		$('#colorPickerCardType' + newCardTypeId).spectrum({
+	    	showInput: false,
+	    	className: "full-spectrum",
+	    	showInitial: false,
+	    	showPaletteOnly: true,
+	    	hideAfterPaletteSelect:true,
+	    	showPalette:true,
+	    	change: function(color) {
+	    		var currVal = color.toHexString();
+    			$('#colorPickerCardType' + newCardTypeId).val(currVal);
+			},
+	    	palette: [
+	        	['#FFFFCC', '#FFFF99', '#FFCCFF', '#FFCCCC', '#FFCC99', '#CCFFFF', '#CCFFCC', '#CCFF99', '#CCCCFF',	'#CCCCCC', '#CCCC99', '#99FFCC', '#fce89a', '#96bcb6', '#aecda5']
+	    	]
+		});
+    });
+
+	//Remove Card Type
+	$('#removeCardType').click(function (event) {
+		//Get last Card Type ID
+		var lastCardTypeId = parseInt($("#cardTypesContainer").children().length);
+
+		if (lastCardTypeId > 2)
+		{
+	        $('#cardType' + lastCardTypeId).parent().remove();
+	    }
+	    else {
+	    	$('#cardTypeLimitWarnLower').show(300).delay(5000).hide(300);
+	    }
+    });
+
+	//Add Section
+	$('#addSection').click(function (event) {
+		//Get next available section ID
+		var newSectionId = parseInt($("#sectionThumbsContainer").children().length)+1;
+
+		if (newSectionId < 8)
+		{
+			var newSectionHTML = '<div class="sectionThumb" style="width:60px;height:99px;">' +
+	                    			'<input id="section' + newSectionId + '" type="text" name="section' + newSectionId + '" data-options="required:true" value="' + newCardSection + '" style="width:64px;"></input>' +
+	                    			'<div class="settingsSectionFooter"> </div>' +
+	                    		  '</div>';
+
+	        $(newSectionHTML).appendTo($('#sectionThumbsContainer'));
+	        if (newSectionId == 2){
+	        	$('#section' + newSectionId).textbox({disabled:false, editable: false});
+	        }
+	        else {
+	        	$('#section' + newSectionId).textbox({disabled:false});
+	        }
+	    }
+	    else {
+	    	$('#sectionLimitWarnUpper').show(300).delay(5000).hide(300);
+	    }
+    });
+
+    //Remove Section
+	$('#removeSection').click(function (event) {
+		//Get last sectionID
+		var lastSectionId = parseInt($("#sectionThumbsContainer").children().length);
+
+		if (lastSectionId > 2)
+		{
+	        $('#section' + lastSectionId).parent().remove();
+	    }
+	    else {
+	    	$('#sectionLimitWarnLower').show(300).delay(5000).hide(300);
+	    }
+    });
+
+	//Generic function that spawns a card object
+	function spawnCard (newCardIdNum, newCardColor, newCardId, newCardSection, newCardTimespent, newCardContents, newCardTitle, newCardDuration) {
+		//Generate HTML skeleton for card
+		//console.log("Spawning card " + newCardId)
+		newCardHtml =	'<div id="metadata' + newCardIdNum + '">' +
+							'<a href="javascript:void(0)" id="editCardMetadata' + newCardIdNum + '">' +
+								'<img src="/images/more.png" style="width:16px;float:left;">' +
+							'</a>' +
+						'</div>' +
+					 	'<div id="' + newCardId + '" draggable="true" class="normalCard" style="background-color: #' + newCardColor + ';">' +
+							'<div class="cardContents" id="cardContents' + newCardIdNum + '">' + 
+								newCardContents + 
+							'</div>' + 
+						'</div>' + 
+						'<div id="' + newCardId + 'Footer">' +
+							'<textarea class="timer' + newCardId + '" value="0 sec" />' +
+							'<a href="#" class="' + newCardId + 'startTimer">' + 
+								'<img src="/images/play_icon.png" style="width:16px;float:right;">' + 
+							'</a>' + 
+							'<a href="#" class="' + newCardId + 'stopTimer">' + 
+								'<img src="/images/pause_icon.png" style="width:16px;float:right;">' + 
+							'</a>' + 
+						'</div>';
+		//Inject new card html into the appropriate section
+		var newCardObj = $(newCardHtml).appendTo($('#' + newCardSection));
+		//console.log(newCardObj[1])
+
+		//convert card div into an easyui panel
+		$(newCardObj[1]).children('.cardContents').panel({
+			title:newCardTitle,
+			tools:$(newCardObj[0]),
+			cls:'panel-card',
+			border:false,
+			headerCls:'cardTitle',
+			closable:true,
+			closeAnimation:'fade',
+			closeDuration:3900,
+			footer:$(newCardObj[2]),
+			//onMove:function(event){
+			//	$('#cardContents'+ newCardIdNum).panel('doLayout');
+			//},
+			onBeforeClose:function(event){
+				var shouldDelete = true;
+				function CheckToDelete(){
+					if (shouldDelete) {
+			    		$('.dayViewContainerTable').each(function() {
+							$('#' + $(this).find("#" + newCardId).parent().attr("id")).attr("rowspan", "1");
+						});
+						$('.weekViewContainerTable').each(function(){
+							$('#' + $(this).find("#" + newCardId).parent().attr("id")).attr("rowspan", "1");
+						});
+						$("#" + newCardId).remove();
+						$.ajax({
+		                	type: "GET",
+				        	url: "/updatecardstatus/" + newCardId,
+				            success: function(msg){
+		                		   	console.log(msg);
+		                		   //	location.reload();
+					            },
+							cache: false
+		                });
+			    	}
+				}
+				//$("#" + newCardId).fadeOut(10000);
+                var messageBody = $("#" + newCardId).children().children().children('.panel-title').text() + ' Card getting removed from board... ' +
+                					'<a href="#" style="color: #000;text-decoration: underline;" id="recoverCard' + newCardId + '">Stop?</a>';
+				$.messager.show({
+					msg: messageBody,
+					showType:'show',
+					timeout:3900
+				}); 
+				$('#recoverCard' + newCardId).click(function (event) {
+					shouldDelete = false;
+					location.reload();
+			    });
+			    setTimeout( CheckToDelete, 3900 )
+			}
+		})
+
+		//change the card styles if its spawned in a "scheduled" view
+		if ($("#" + newCardId).parent().parent().parent().attr("class") === "dayViewContainerTable") {
+		//if (viewToLoad === "Day") {
+			var rowSpan = Math.ceil(newCardDuration / 15)
+			var newHeight = 32 * rowSpan - 1;
+			//currentCardTdIndex = $("#" + sectionId).parent().parent().parent().find(iter).index()
+			//var iteratorSection = $("#" + sectionId).parent()
+			//currentCardTdIndex = $("#" + sectionId).parent().parent().parent().find(iteratorSection).index()
+
+			alterCardStyle ("scheduledCard", rowSpan, $(newCardObj[1]), newCardSection, newHeight, "90%");
+			//adjustForMultipleCards("dayViewContainerTable")
+		}
+		else if ($("#" + newCardId).parent().parent().parent().attr("class") === "weekViewContainerTable") {
+		//else if (viewToLoad === "Week") {
+			var rowSpan = Math.ceil(newCardDuration / 15)
+			var newHeight = 32 * rowSpan - 1;
+			//alterCardStyle ("scheduledCard", rowSpan, newCardId, newCardSection, newHeight, "96%");
+			//console.log($(newCardObj))
+			alterCardStyle ("scheduledCard", rowSpan, $(newCardObj[1]), newCardSection, newHeight, "96%");
+		}
+		//console.log($($(newCardObj[1]).parent())
+		if ($(newCardObj[1]).parent().attr("class")){
+			if ($(newCardObj[1]).parent().attr("class").substring(0, 12) === "cardContents"){
+				//console.log("Need to adjust the width of:")
+				//console.log($("#" + newCardId).parent().parent().parent())
+				$("#" + newCardId).parent().parent().parent().css("width", "+=26");
+				$("#" + newCardId).parent().panel('resize',{
+					width:$("#" + newCardId).parent().parent().parent().innerWidth()-1,
+				})
+			}
+		}
+
+		//Hide timer functions and close button for cards not owned by current user
+		if (viewToLoad === "TeamWeek" || viewToLoad === "TeamOverview"){
+			if (newCardTitle != settingsUserName){
+		//		$(newCardObj[1]).children('.cardContents').panel('footer').hide()
+				$(newCardObj[1]).children().children('.cardContents').panel('footer').hide()
+				$(newCardObj[1]).children().children('.cardContents').panel({closable: false, tools: false})
+			}
+		}
+
+		//Allow new card to be draggable
+        $('#card' + newCardIdNum).bind('dragstart', function(event) {
+        //$(newCardObj[1]).bind('dragstart', function(event) {
+        	event.originalEvent.dataTransfer.setData("text/plain", event.target.getAttribute('id'));
+        	currentCardId = event.target.getAttribute('id');
+        	
+        	$('#' + event.target.getAttribute('id')).attr("dragSource", document.getElementById(currentCardId).parentNode.id)
+        });
+    	//}
+
+		//Add listeners for this card
+		$(function () {
+			$('#cardContents'+ newCardIdNum).dblclick(function (e) {
+			//$(newCardObj[1]).children('.cardContents').dblclick(function (e) {
+				e.stopPropagation();
+				var currentEle = $(this);
+				var value = $(this).html();
+				updateVal(currentEle, value, newCardIdNum);
+			});
+		});
+
+		if (viewToLoad === "Day") {
+			activateTimers (newCardId);
+		}
+		
+		//Set card metadata
+		if (newCardTimespent < 60){
+			newCardTimespent = newCardTimespent + " Sec"
+		}
+		else if (newCardTimespent > 60 && newCardTimespent < 3600 ){
+			newCardTimespent = parseInt(newCardTimespent / 60) + " Min"
+		}
+		else if (newCardTimespent > 3600){
+			newCardTimespent = parseInt(newCardTimespent / 3600) + " Hour"
+		}
+        $(".timer" + newCardId).val(newCardTimespent);
+		$("#" + newCardId).attr( "data-prevTimeSpent", newCardTimespent);	
+		//$(newCardObj[1]).attr( "data-prevTimeSpent", newCardTimespent);
+
+		//add listener for card metadata editor
+		$('#editCardMetadata' + newCardIdNum).on('click', function() {
+			$("#metadatadlg").attr( "cardid", "card" + newCardIdNum);
+
+			$.ajax({
+               	type: "GET",
+		       	url: "/getcardmetadata/card" + newCardIdNum,
+		        success: function(msg){
+		        	//Load Settings page up with current form data
+		        	$('#cardSettings').form('load',{
+		        		cardScheduledTime:msg[0].time,
+		        		cardScheduledDate:msg[0].date,
+		        		cardDuration:msg[0].duration,
+		        		recurringCombobox:msg[0].repeat,
+		        		morecarddata:msg[0].moredata
+					});
+					$("#metadatadlg").dialog('open');
+			    },
+				cache: false
+            }); 
+		});
+	}
+
+	//Query DB to find next card ID iteration
+	function getNextAvailableId () {
+		$.ajax({
+			type: "GET",
+            url: "/getlastid",
+            success: function(msg){
+            	if (msg.length < 1) {
+            		newCardIdNum = 0;
+            	}
+            	else {
+            		newCardIdNum = parseInt(msg + 1);
+            	}
+            },
+			cache: false,
+			async: false
+        });
+	}
+
+	//Sets the current card's contents
+	function updateVal(currentEle, value, newCardIdNum) {
+		currentCardId = "card" + newCardIdNum;
+		currentTextBox = "thVal" + currentCardId;
+		$(currentEle).html('<textarea id="' + currentTextBox + '" class="' + currentTextBox + '" >' + value + '</textarea>');
+
+		$("." + currentTextBox).on("focus", function(event) {
+		  event.preventDefault();
+		  setTimeout(function() { $(event.target).select(); }, 1); 
+		});
+
+		$("." + currentTextBox).focus();
+
+		$(document).click(function () {
+			newContents = $("." + currentTextBox).val();
+			if (newContents === "")
+			{
+				//Catch the scenario where textbox is empty
+				newContents = "Double-click to edit";
+				$(currentEle).html(newContents);
+				$(document).off("click");
+			}
+			else if (newContents === value)
+			{
+				//Catch the scenario where there was no change
+				$(currentEle).html(newContents);
+				$(document).off("click");
+			}
+			else
+			{
+					var currentEleId = $(currentEle).html($("." + currentTextBox).val()).context.id;
+					//var currentCardId = (document.getElementById(currentEleId).parentNode.parentNode.id);
+					$(currentEle).html(newContents);
+					
+					if ($('#' + currentCardId).parent().attr("class") === "inprogress-dropable") {
+						cardRowSpan = Math.ceil(($("#" + currentCardId).outerHeight() + 20) / 30);
+						$('#' + currentCardId).parent().attr("rowspan", cardRowSpan);
+					}
+					$.ajax({
+						type: "GET",
+						data: "content=" + newContents,
+		                url: "/setcardcontent/" + currentCardId,
+		                success: function(msg){
+		                   	console.log(msg);
+		                },
+		       	        cache: false
+		        	});		
+		        	$(document).off("click");
+				}
+			
+		});
+	}
+		
+	//Writes a single card's information to the DB
+	function updateSavedCardDetails (cardTitle, cardColor, cardContents, cardId, cardSection, cardTimespent, cardDuration) {
+		$.ajax({
+			type: "GET",
+			async: true,
+			url: "/updatecarddetails/" + cardId,
+			data: "&type=" + cardColor + "&title=" + cardTitle + "&content=" + cardContents + "&section=" + cardSection + "&active=YES&timespent=" + cardTimespent + "&duration=" + cardDuration + "&user=" + settingsUserName,
+			success: function(msg){
+				console.log(msg);
+            }
+		}); 
+	}
+
+	//Writes timer stop and start events to db
+	function storetimes(currentCardId, timeValue, timeType, timeSpent){
+		timeValue = parseInt(timeValue * 1000)
+		$.ajax({
+			type: "GET",
+            data: "timevalue=" + timeValue + "&timetype=" + timeType,
+            url: "/setcardtimeevent/" + currentCardId,
+            success: function(msg){
+               	console.log(msg);
+            },
+            cache: false,
+			async: false
+        });
+        $.ajax({
+			type: "GET",
+            data: "timespent=" + timeSpent,
+            url: "/settimespent/" + currentCardId,
+            success: function(msg){
+               	console.log(msg);
+            },
+            cache: false,
+			async: false
+        });
+	}
+
+	//Converts an HTML RGB format color value to Hex format
+	function rgb2hex(rgb) {
+	    if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
+
+	    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+	    function hex(x) {
+	        return ("0" + parseInt(x).toString(16)).slice(-2);
+	    }
+	    return "" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+	}
+
+	//Starts or stops the timer desplayed on a card
+	function activateTimers(newCardId){
+		var currentCardId = newCardId;
+		var currentCardTimer = ".timer" + currentCardId;
+		var currentCardStartTimer = "." + currentCardId + "startTimer";
+		var currentCardStopTimer = "." + currentCardId + "stopTimer";
+	
+		//When the timer is started
+		$(currentCardStartTimer).on('click', function() {
+			//Get the "timespent" value from the DB for this card
+			$.ajax({
+				type: "GET",
+                url: "/gettimespent/" + currentCardId,
+       		    success: function(msg){
+					prevTimeSpent = msg[0].timespent;
+        	    },
+       		    cache: false,
+       		    dataType: "json",
+				async: false
+	        });
+
+			if(prevTimeSpent === "")
+            {
+				prevTimeSpent = 0;
+            }
+
+			currentCardTimer = $(currentCardStartTimer).prev().attr('class');
+			startTimeValue = $.now()/1000;
+
+			//update the stickietimes table with the start event (used for reporting)
+			storetimes(currentCardId, startTimeValue, "start", prevTimeSpent);
+
+			//Store some data into the HTML elements, makes for easier retrieval
+			$("#" + currentCardId).attr("data-startTimeValue", startTimeValue);
+			$("#" + currentCardId).attr("data-prevTimeSpent", prevTimeSpent);
+			
+			//start the timer function, used for the UI only
+			ticktock(currentCardId, prevTimeSpent, startTimeValue, currentCardTimer, "start");
+		});
+
+		//When the timer is stopped
+		$(currentCardStopTimer).on('click', function() {
+			startTimeValue = $("#" + currentCardId).attr( "data-startTimeValue");
+
+			//In case the pause button was clicked, and the start button not
+			if (!startTimeValue)
+			{
+				// Do nothing
+			}
+			else
+			{
+				currentCardTimer = $(currentCardStopTimer).prev().prev().attr('class');
+				prevTimeSpent = $("#" + currentCardId).attr( "data-prevTimeSpent");
+				
+				//stop the timer function, used for the UI only
+				ticktock(currentCardId, prevTimeSpent, startTimeValue, currentCardTimer, "stop");
+				
+				var stopTimeValue = $.now()/1000;
+				sessionTimeSpent = parseInt(stopTimeValue - startTimeValue, 10);
+				var totalTimeSpent = parseInt(sessionTimeSpent, 10)+parseInt(prevTimeSpent, 10);
+				
+				//update the stickietimes table with the stop event (used for reporting)
+				storetimes(currentCardId, stopTimeValue, "stop", totalTimeSpent);
+				$("#" + currentCardId).attr("data-prevTimeSpent", totalTimeSpent);
+			}
+		});
+
+		//Time function to display visual feedback
+		function ticktock(currentCard, prevTimeSpent, startTimeValue, currentCardTimer, Action){
+			if (Action === "start"){
+				var interval = 1000;
+				var tictocGif = '<img id="tictocgif'+currentCardTimer+'" src="/images/tictok.gif" style="float: left;padding: 3px;"></img>';
+				$(tictocGif).appendTo($("." + currentCardTimer).parent())
+				intervalId = setInterval(function(){
+	        	    var timerLable = parseInt($.now()/1000, 10) - parseInt(startTimeValue, 10);
+        	        timerLable = parseInt(timerLable, 10) + parseInt(prevTimeSpent, 10);
+					if (timerLable < 60){
+						$("." + currentCardTimer).val(timerLable + " Sec");
+					}
+					else if (timerLable > 60 && timerLable < 3600 ){
+						timerLable = parseInt(timerLable / 60)
+						interval = 60000
+						$("." + currentCardTimer).val(timerLable + " Min");
+					}
+					else if (timerLable > 3600){
+						timerLable = parseInt(timerLable / 3600)
+						$("." + currentCardTimer).val(timerLable + " Hour");
+					}
+                	
+				},interval);
+				$("." + currentCardTimer).attr( "data-timer-id",intervalId);
+			}
+			else
+			{
+				clearInterval( $("." + currentCardTimer).attr("data-timer-id") );
+				$('#tictocgif' + currentCardTimer).remove();
+			}
+		}
+	}
+</script>
+</body>
